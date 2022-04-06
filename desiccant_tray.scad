@@ -1,21 +1,77 @@
+/*&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+&&  SpringFactory: desiccant_tray.scad
+
+        Copyright (c) 2022, Jeff Hessenflow
+        All rights reserved.
+        
+        https://github.com/jshessen/desiccant_tray
+&&
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/
+
+/*&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+&&  GNU GPLv3
+&&
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program. If not, see <https://www.gnu.org/licenses/>.
+&&
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/
+
+
+
+
+
+use <MCAD/regular_shapes.scad>;
+
+
+
+
+
+/*?????????????????????????????????????????????????????????????????
+??
+/*???????????????????????????????????????????????????????
+?? Section: Customizer
+??
+    Description:
+        The Customizer feature provides a graphic user interface for editing model parameters.
+??
+???????????????????????????????????????????????????????*/
+/* [Global] */
 //Display Verbose Output?
-VERBOSE=1; // [1:Yes,0:No]
-//Units
-UNITS=1; // [0:in,1:mm]
+$VERBOSE=1; // [1:Yes,0:No]
 
 /* [Tray Dimensions] */
 //Tray Diameter (X)
-CUSTOM_TRAY_DIAMETER=0; // [1:.1:250]
+CUSTOM_TRAY_DIAMETER=0;     // [1:.1:250]
 //Tray Height (Z)
-CUSTOM_TRAY_HEIGHT=0; // [1:.1:210]
+CUSTOM_TRAY_HEIGHT=0;       // [1:.1:210]
 //Center Diameter (X)
-CUSTOM_CENTER_DIAMETER=0; // [1:.1:210]
+CUSTOM_CENTER_DIAMETER=0;   // [1:.1:210]
 //Wall Width (X)
-CUSTOM_WALL_WIDTH=0; // [.1:.1:250]
+CUSTOM_WALL_WIDTH=0;        // [.1:.1:250]
 //Floor Depth (Z)
-CUSTOM_FLOOR_DEPTH=0; // [.1:.1:210]
+CUSTOM_FLOOR_DEPTH=0;       // [.1:.1:210]
+//Number of Tray Sections
+CUSTOM_TRAY_SECTIONS=0;     // [1:1:20]
 /* [Misc] */
+/*
+?????????????????????????????????????????????????????????????????*/
 
+
+
+
+
+/*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Section: Defined/Derived Variables
+*/
 /* [Hidden] */
 $fa = 0.3;
 $fs = 0.3;
@@ -23,57 +79,72 @@ $fs = 0.3;
 /*
 If the corresponding input variable is set to zero (0), define the working values relative to the PIPE_ID
 */
-CONVERSION=(UNITS==0) ? 25.4 : 1;
-DIAMETER=(CUSTOM_TRAY_DIAMETER==0) ? 308 : CUSTOM_TRAY_DIAMETER;
-HEIGHT=(CUSTOM_TRAY_HEIGHT==0) ? 23 : CUSTOM_TRAY_HEIGHT;
-HOLE=(CUSTOM_CENTER_DIAMETER==0) ? 68 : CUSTOM_TRAY_DIAMETER;
-WALL=(CUSTOM_WALL_WIDTH==0) ? 2.5 : CUSTOM_WALL_WIDTH;
-FLOOR=(CUSTOM_FLOOR_DEPTH==0) ? 3 : CUSTOM_FLOOR_DEPTH;
+diameter=(CUSTOM_TRAY_DIAMETER==0) ? 308 : CUSTOM_TRAY_DIAMETER;
+radius=diameter/2;
+hole=(CUSTOM_CENTER_DIAMETER==0) ? 68 : CUSTOM_TRAY_DIAMETER;
+hole_radius=hole/2;
+height=(CUSTOM_TRAY_HEIGHT==0) ? 23 : CUSTOM_TRAY_HEIGHT;
+wall=(CUSTOM_WALL_WIDTH==0) ? 2.5 : CUSTOM_WALL_WIDTH;
+floor=(CUSTOM_FLOOR_DEPTH==0) ? 3 : CUSTOM_FLOOR_DEPTH;
+angle=(CUSTOM_TRAY_SECTIONS==0) ? 90 : 360/CUSTOM_TRAY_SECTIONS;
 
-//Metric to Imperial Conversion
-scale([CONVERSION,CONVERSION,CONVERSION])
-{
-    //Create Tray Model
-    if(VERBOSE) echo("--> Begin Tray Modeling");
-    union(){
-        difference()
-        {
-            difference()
-            {
-                if(VERBOSE) echo("--> Create Base Model");
-                if(VERBOSE) echo(str("**======> Tray Diameter: ",DIAMETER,"**"));
-                if(VERBOSE) echo(str("**======> Tray Wall Height: ",HEIGHT,"**"));
-                if(VERBOSE) echo(str("**======> Hole Diameter: ",HOLE,"**"));
-                cylinder_tube(HEIGHT,DIAMETER/2,DIAMETER/2-HOLE/2);
-                if(VERBOSE) echo("--> Complete Base Model");
-                
-                if(VERBOSE) echo("--> Hollow Base Model");
-                if(VERBOSE) echo(str("**======> Wall Width: ",WALL,"**"));
-                if(VERBOSE) echo(str("**======> Floor Depth: ",FLOOR,"**"));
-                translate([0,0,FLOOR]) cylinder_tube(HEIGHT-FLOOR,DIAMETER/2-WALL,DIAMETER/2-HOLE/2-WALL*2);
-                if(VERBOSE) echo("--> Complete \"Hole\" Removal");
-            }
-            if(VERBOSE) echo("--> Divide Model (X/Y)");
-            translate([0,DIAMETER/2,HEIGHT/2]) cube([DIAMETER,DIAMETER,HEIGHT],center=true);
-            translate([DIAMETER/2,0,HEIGHT/2]) cube([DIAMETER,DIAMETER,HEIGHT],center=true);
-            if(VERBOSE) echo("--> Complete Divide Model (X/Y)");
+if($VERBOSE) echo(str("**======> Tray Diameter: ",diameter,"**"));
+if($VERBOSE) echo(str("**======> Hole Diameter: ",hole,"**"));
+if($VERBOSE) echo(str("**======> Tray Wall Height: ",height,"**"));
+if($VERBOSE) echo(str("**======> Wall Width: ",wall,"**"));
+if($VERBOSE) echo(str("**======> Floor Depth: ",floor,"**"));
+/*
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
+
+
+
+
+
+/*/////////////////////////////////////////////////////////////////
+// Section: Modules
+*/
+/*///////////////////////////////////////////////////////
+// Module: make_dessicant_tray()
+//
+    Description:
+        Wrapper module to create desiccant_tray object
+
+    Arguments:
+        N/A
+*/
+make_dessicant_tray();
+///////////////////////////////////////////////////////*/
+module make_dessicant_tray(){
+    // Create Tray Shape
+    rotate([0,0,180]){
+        hollow_shape(){
+            make_shape(radius,hole_radius,height, angle=angle);
+            translate([0,0,floor])
+                make_shape(radius-wall,hole_radius+wall,height, angle=angle);
         }
-        if(VERBOSE) echo("--> Recreate Wall(s) (X/Y)");
-        translate([-(DIAMETER/4+HOLE/4),-WALL/2,HEIGHT/2]) cube([DIAMETER/2-HOLE/2,WALL,HEIGHT],center=true);
-        translate([-WALL/2,-(DIAMETER/4+HOLE/4),HEIGHT/2]) cube([WALL,DIAMETER/2-HOLE/2,HEIGHT],center=true);
-        if(VERBOSE) echo("--> Complete Wall(s) Recreation (X/Y)");
-    } 
+    }
+    // Recreate Wall Segments (X/Y)
+    translate([hole_radius,0,0]) cube([radius-hole_radius,wall,height]);
+    translate([0,hole_radius,0]) cube([wall,radius-hole_radius,height]);
 }
+///////////////////////////////////////////////////////*/
 
-//Modules
-module cylinder_tube(height, radius, wall, center = false){
-    tubify(radius,wall)
-    cylinder(h=height, r=radius, center=center);
+/////////////////////////////////////////////////////////
+module make_shape(radius,hole_radius,height, angle=90) {
+    r=radius-hole_radius;
+    translate([0,0,height/2]) rotate_extrude(angle=angle, $fn=360)
+        translate([-((r/2)+hole_radius),0,0]) square([r,height],center=true);
 }
-module tubify(radius,wall){
-  difference()
-  {
-    children(0);
-    translate([0, 0, -0.1]) scale([(radius-wall)/radius, (radius-wall)/radius, 2]) children(0);
-  }
+module hollow_shape(wall,floor) {
+    difference(){
+        children(0);
+        children(1);
+    }
 }
+module mirror_copy(vec=[0,1,0]) {
+    children();
+    mirror(vec) children();
+}
+///////////////////////////////////////////////////////*/
+/*
+/////////////////////////////////////////////////////////////////*/
