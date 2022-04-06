@@ -8,18 +8,18 @@ This introduced the need to renew the desiccant and I quickly stumbled across @m
 
 I have included the OpenSCAD file and enabled Customizer so that you can adjust to any other set of dimensions. By default the following parameters were used.
 
+```shell
 ECHO: "======> Tray Diameter: 308"
 ECHO: "======> Tray Wall Height: 23"
 ECHO: "======> Hole Diameter: 68"
-ECHO: "--> Complete Base Model"
-ECHO: "--> Hollow Base Model"
 ECHO: "======> Wall Width: 2.5"
 ECHO: "======> Floor Depth: 3"
+```
 
 All of the code/files are contained within GitHub - desiccant_tray
-
+```shell
 git clone https://github.com/jshessen/desiccant_tray.git
-The overall project is also availale on
-
-Thingiverse - https://www.thingiverse.com/thing:5248625
-Printables - https://www.printables.com/model/38161-dehydrator-desiccant-tray
+```
+The overall project is also availale on:
+- Thingiverse - https://www.thingiverse.com/thing:5248625
+- Printables - https://www.printables.com/model/38161-dehydrator-desiccant-tray
