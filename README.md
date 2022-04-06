@@ -21,5 +21,5 @@ All of the code/files are contained within GitHub - desiccant_tray
 git clone https://github.com/jshessen/desiccant_tray.git
 ```
 The overall project is also availale on:
-- Thingiverse - https://www.thingiverse.com/thing:5248625
+- Thingiverse - https://www.thingiverse.com/thing:4563228
 - Printables - https://www.printables.com/model/38161-dehydrator-desiccant-tray
