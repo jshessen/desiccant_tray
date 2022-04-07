@@ -116,16 +116,20 @@ make_dessicant_tray();
 ///////////////////////////////////////////////////////*/
 module make_dessicant_tray(){
     // Create Tray Shape
-    rotate([0,0,180]){
-        hollow_shape(){
-            make_shape(radius,hole_radius,height, angle=angle);
-            translate([0,0,floor])
-                make_shape(radius-wall,hole_radius+wall,height, angle=angle);
+    union(){
+        rotate([0,0,180]){
+            hollow_shape(){
+                make_shape(radius,hole_radius,height, angle=angle);
+                translate([0,0,floor])
+                    make_shape(radius-wall,hole_radius+wall,height, angle=angle);
+            }
         }
+        // Recreate Wall Segments (X/Y)
+        translate([hole_radius,0,0])
+            cube([radius-hole_radius,wall,height]);
+        rotate([0,0,angle]) translate([hole_radius,0,0])
+            cube([radius-hole_radius,wall,height]);
     }
-    // Recreate Wall Segments (X/Y)
-    translate([hole_radius,0,0]) cube([radius-hole_radius,wall,height]);
-    translate([0,hole_radius,0]) cube([wall,radius-hole_radius,height]);
 }
 ///////////////////////////////////////////////////////*/
 
