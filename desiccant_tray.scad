@@ -81,7 +81,7 @@ If the corresponding input variable is set to zero (0), define the working value
 */
 diameter=(CUSTOM_TRAY_DIAMETER==0) ? 308 : CUSTOM_TRAY_DIAMETER;
 radius=diameter/2;
-hole=(CUSTOM_CENTER_DIAMETER==0) ? 68 : CUSTOM_TRAY_DIAMETER;
+hole=(CUSTOM_CENTER_DIAMETER==0) ? 68 : CUSTOM_CENTER_DIAMETER;
 hole_radius=hole/2;
 height=(CUSTOM_TRAY_HEIGHT==0) ? 23 : CUSTOM_TRAY_HEIGHT;
 wall=(CUSTOM_WALL_WIDTH==0) ? 2.5 : CUSTOM_WALL_WIDTH;
